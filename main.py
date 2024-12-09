@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
-import os
+import os, re
 from receipt_ocr import getReceiptJSON
  
  #uvicorn main:app --reload
@@ -17,9 +17,12 @@ app = FastAPI()
 
 # CORS configuration
 origins = [
-    "http://localhost:5501",  
-    "http://localhost:5174",
-    "*"
+    "http://10.3.0.86",  # Your development machine's IP
+    "http://10.3.0.25",
+    "http://localhost",
+    "http://127.0.0.1",
+    "http://192.168.87.228",
+    "*",  # Allow all origins for testing
 ]
 
 app.add_middleware(
@@ -42,10 +45,12 @@ async def getReceiptInfo(file: UploadFile = File(...)):
         JSON response with receipt details.
     """
     try:
+        sanitized_filename = re.sub(r'[^a-zA-Z0-9_.-]', '_', file.filename)
+        print(f"Sanitized file name: {sanitized_filename}")
         # Save uploaded file to disk
         upload_dir = "uploads"
         os.makedirs(upload_dir, exist_ok=True)
-        file_path = os.path.join(upload_dir, file.filename)
+        file_path = os.path.join(upload_dir, sanitized_filename)
 
         with open(file_path, "wb") as f:
             f.write(await file.read())

@@ -15,18 +15,41 @@ schema = {
     },
     "required": ["category", "total"]
   }
+def correct_image_orientation(image_path):
+    # Open the image file
+    img = Image.open(image_path)
+
+    # Check if the image has EXIF data (metadata)
+    try:
+        # Extract EXIF data
+        exif = img._getexif()
+        if exif is not None:
+            # Find the orientation tag
+            for tag, value in exif.items():
+                if tag == 274:  # Orientation tag in EXIF
+                    # Rotate the image based on the orientation value
+                    if value == 3:
+                        img = img.rotate(180, expand=True)
+                    elif value == 6:
+                        img = img.rotate(270, expand=True)
+                    elif value == 8:
+                        img = img.rotate(90, expand=True)
+    except (AttributeError, KeyError, IndexError):
+        # If no EXIF data exists, skip the correction
+        pass
+    return img
 
 def preprocess_image(image_path):
     dpi = 300
-    img = Image.open(image_path)
+    img = correct_image_orientation(image_path)
     img.info['dpi'] = (dpi, dpi)
     img = np.array(img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #opt_thr, img_ = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
     return gray
 
-def get_text(image_path, oem = 1, psm = 6):
-    text = pytesseract.image_to_string(preprocess_image(image_path), config = f'--oem {oem} --psm {psm}')
+def get_text(image_path):
+    text = pytesseract.image_to_string(preprocess_image(image_path), config = f'--oem 1 --psm 3')
     print("Extracted text:")
     print(text)
     return text
@@ -106,6 +129,6 @@ def getReceiptJSON(image_path):
 
 # Example usage (can be removed in deployment)
 if __name__ == "__main__":
-    test_image_path = "receipt5.png"
+    test_image_path = r"uploads\2c649abc-2437-4655-9acf-c925aefa37822787772395577112386.jpg"
     result = getReceiptJSON(test_image_path)
     print(json.dumps(result, indent=4))
