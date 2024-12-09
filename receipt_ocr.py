@@ -6,6 +6,8 @@ import cv2
 import pytesseract
 import jsonschema
 
+#uvicorn main:app --reload --host 192.168.87.228  --port 8000
+
 schema = {
     "type": "object",
     "properties": {
