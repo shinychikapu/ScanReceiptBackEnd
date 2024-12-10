@@ -17,4 +17,18 @@ pip install -r requirements.txt
 # CORS configuration
 In main.py make sure the URL you are sending request from is included in the origins array
 
-You can now call /receipt/post to get your receipt's information
+If you are testing with a physical device, connect your computer to your phone's hotspot
+
+Run this on the command line get ip4 address
+```
+ipconfig
+```
+Run the server with this command
+```
+uvicorn main:app --reload --host <your ip4>  --port 8000
+```
+
+You can now call the endpoint to get your receipt's information
+```
+http://<your ip4>:8000/receipt/post
+```
