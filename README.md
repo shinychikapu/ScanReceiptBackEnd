@@ -1,3 +1,10 @@
+# Installing Python
+https://docs.python.org/3/using/windows.html
+
+https://docs.python.org/3/using/mac.html
+
+https://docs.python.org/3/using/unix.html
+
 # Installing LM Studio
 https://lmstudio.ai/
 
